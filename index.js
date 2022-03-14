@@ -1,100 +1,189 @@
-const path=require('path')
-const express=require('express')
-
-const express = require('express')
-const app = express()
-const mongoose = require('mongoose');
+const express = require("express");
+const mongoose =  require("mongoose");
+const app = express();
 const port = 5000;
-
-const connectDB = () =>{
-    return mongoose.connect("mongodb+srv://pranjal2795:<password>@cluster0.e0wvc.mongodb.net/myFirstDatabase?retryWrites=true&w=majority")
+//connect mongo database
+const connect = ()=>{
+    return mongoose.connect("mongodb+srv://pranjal2795:Saridon1@cluster0.e0wvc.mongodb.net/myFirstDatabase?retryWrites=true&w=majority");
 }
-const userSchema= new mongoose.Schema(
-{
-    body :{type:String,required:false}
-  
-},
-{
-    timestamps:true,
-});
 
+const userSchema = new mongoose.Schema(
+    {
+        firstName:{type:String, required:true},
+        middleName:{type:String},
+        lastName:{type:String,required:true},
+        age:{type:Number, required:true},
+        email:{type:String, required:true},
+        address:{type:String, required:true},
+        gender:{type:String, default:"Female"},
+        type:{type:String, default: "customer"},
+    },
+    {
+        versionKey:false,
+        timestamps:true
+    }
+)
 const User = mongoose.model("user",userSchema);
-
-app.get("/User", async(req, res) =>{
-
-    try{
-const user1=await User.find({}).lean().exec();
-return res.send(user1);
+const branchdetailSchema = mongoose.Schema(
+    {
+        name:{type:String, required:true},
+        address:{type:String, required:true},
+        IFSC:{type:String, required:true},
+        MICR:{type:Number, required:true},
+    },
+    {
+        versionKey:false,
+        timestamps:true
     }
-    catch(err){
-        console.error(err)
+)
+const Branchdetail = mongoose.model("branchdetail",branchdetailSchema);
+
+const masteraccountSchema = mongoose.Schema(
+    {
+        balance:{type:Number, required:true},
+        masteruser_id:{
+            type: mongoose.Schema.Types.ObjectId,
+            ref:"user",
+            required:true
+        },
+        manager_id:{
+            type: mongoose.Schema.Types.ObjectId,
+            ref:"user",
+            required:true
+        },
+        branchdetail_id:{
+            type: mongoose.Schema.Types.ObjectId,
+            ref:"branchdetail",
+            required:true
+        }
+    },
+    {
+        versionKey:false,
+        timestamps:true
     }
-})
+)
+const Masteraccountdetail=mongoose.model("masteraccountdetail",masteraccountSchema);
 
-app.post("/User", async(req, res) =>{
-
-    try{
-const user1=await User.create(req.body);
-return res.send(user1);
+const savingsaccountSchema=mongoose.Schema(
+    {
+        account_number:{type:Number,
+             required:true},
+        balance:{type:Number,
+             required:true},
+        interestRate:{type:Number,
+             required:true},
+        savingsuser_id:{
+            type: mongoose.Schema.Types.ObjectId,
+            ref:"user",
+            required:true
+        },
+        branchdetail_id:{
+            type: mongoose.Schema.Types.ObjectId,
+            ref:"branchdetail",
+            required:true
+        },
+        master_id:{
+            type: mongoose.Schema.Types.ObjectId,
+            ref:"masteraccountdetail",
+            required:true
+        }
+    },
+    {
+        versionKey:false,
+        timestamps:true
     }
-    catch(err){
-        console.error(err)
+)
+const Savingsaccount = mongoose.model("savingsaccountdetail",savingsaccountSchema);
+
+const fixedaccountSchema = mongoose.Schema(
+    {
+        account_number:{type:Number,
+             required:true},
+        balance:{type:Number,
+             required:true},
+        interestRate:{type:Number,
+             required:true},
+        startdate:{type:String,
+             required:true},
+        maturitydate:{type:String,
+             required:true},
+        fixeduser_id:{
+            type: mongoose.Schema.Types.ObjectId,
+            ref:"user",
+            required:true
+        },
+        branchdetail_id:{
+            type: mongoose.Schema.Types.ObjectId,
+            ref:"branchdetail",
+            required:true
+        },
+        master_id:{
+            type: mongoose.Schema.Types.ObjectId,
+            ref:"masteraccountdetail",
+            required:true
+        }
+    },
+    {
+        versionKey:false,
+        timestamps:true
     }
-})
+)
+const Fixedaccountnumber=mongoose.model("fixedaccountnumber",fixedaccountSchema);
 
 
-app.get('/BranchDetail', (req, res) =>{
-
-    try{
-res.send("h")
-
+app.post("/users",async(req,res)=>{
+    try {
+        const user = await User.create(req.body);
+        return res.status(200).send({holder: user});
+    } catch (error) {
+        return res.status(500).send(error.message);
     }
-    catch(err){
-        console.error(err)
-    }
-})
-
-
-app.get('/MasterAccount', (req, res) =>{
-
-    try{
-res.send("h")
-
-    }
-    catch(err){
-        console.error(err)
-    }
-})
-
-app.get('/SavingsAccount', (req, res) =>{
-
-    try{
-res.send("h")
-
-    }
-    catch(err){
-        console.error(err)
-    }
-})
-
-app.get('/FixedAccount', (req, res) =>{
-
-    try{
-res.send("h")
-
-    }
-    catch(err){
-        console.error(err)
-    }
-})
-
-app.listen(port,async ()=> {
-    try{
-    await connectDB();
-    console.log("listening on port "+port)
-}
-catch(err)
-{
-    console.log(error)
-}
 });
+
+
+app.get("/masteraccount", async(req,res)=>{
+    try {
+        const master = await Masteraccountdetail.find()
+        .populate("user") 
+        .lean()
+        .exec();
+        return res.status(200).send({masterholder: master});
+    } catch (error) {
+        return res.status(500).send(error.message);
+    }
+});
+app.post("/savingsaccount",async(req,res)=>{
+    try {
+        const saving = await Savingsaccount.create(req.body);
+        return res.status(200).send({savingsholder: saving});
+    } catch (error) {
+        return res.status(500).send(error.message);
+    }
+});
+
+app.post("/fixedaccount",async(req,res)=>{
+    try {
+        const fixed = await Fixedaccountnumber.create(req.body);
+        return res.status(200).send({fixed: fixed});
+    } catch (error) {
+        return res.status(500).send(error.message);
+    }
+});
+
+    app.get("/masteraccount/:id", async(req,res)=>{
+        try {
+            const master = await Masteraccountdetail.find(req.params.id).lean().exec();
+            return res.status(200).send({masterholder: master});
+        } catch (error) {
+            return res.status(500).send(error.message);
+        }
+    });
+
+    app.listen(port, async()=>{
+        try {
+            await connect();
+        } catch (error) {
+            console.log(error);
+        }
+        console.log("listeninig on port "+port);
+    });

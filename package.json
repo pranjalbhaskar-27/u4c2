@@ -8,8 +8,12 @@
   },
   "author": "Pranjal fw15_376",
   "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/pranjalbhaskar-27/u4c2.git"},
   "dependencies": {
     "express": "^4.17.3",
-    "mongoose": "^6.2.6"
+    "mongoose": "^6.2.6",
+    "nodemon": "^2.0.15"
   }
 }
