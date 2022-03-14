@@ -35,9 +35,11 @@ const UserSchema= new Schema({
     },
     createdAt:{
         type:Number,
+        required:true
     },
     updatedAt:{
         type:Number,
+        required:true
     }
     // middleName
 })
@@ -61,13 +63,28 @@ const BranchDetailSchema={
     },
     createdAt:{
         type:Number,
+        required:true
     },
     updatedAt:{
         type:Number,
+        required:true
     }
 }
 
-
+const MasterAccountSchema={
+    balance:{
+        type:Number,
+        required:[true,'Balance nil']
+    },
+    createdAt:{
+        type:Number,
+        required:true
+    },
+    updatedAt:{
+        type:Number,
+        required:true
+    }
+}
 
 const SavingAccSchema={
     account_number:{
@@ -84,9 +101,11 @@ const SavingAccSchema={
     },
     createdAt:{
         type:Number,
+        required:true
     },
     updatedAt:{
         type:Number,
+        required:true
     }
 }
 
@@ -109,9 +128,11 @@ const FixedAccountSchema={
     },
     createdAt:{
         type:Number,
+        required:true
     },
     updatedAt:{
         type:Number,
+        required:true
     }
 }
 
@@ -121,5 +142,13 @@ module.exports=User
 const BranchDetail=mongoose.model('branchdetail',BranchDetailSchema);
 module.exports=BranchDetail
 
-const User=mongoose.model('user',UserSchema);
-module.exports=User
+const MasterAccount=mongoose.model('masteraccount',MasterAccountSchema);
+module.exports=MasterAccount
+
+const SavingsAccount=mongoose.model('savingacc',SavingAccSchema);
+module.exports=SavingsAccount;
+
+const FixedAccount=mongoose.model('fixedaccount',FixedAccountSchema);
+module.exports=FixedAccount
+
+
